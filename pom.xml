@@ -8,7 +8,7 @@
         <artifactId>meta-base</artifactId>
         <groupId>com.spring.boot.base</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../meta-base/pom.xml</relativePath>
+        <relativePath>../meta-base</relativePath>
     </parent>
 
     <groupId>com.spring.boot.base</groupId>
@@ -22,7 +22,6 @@
                 <groupId>com.spring.boot.base</groupId>
                 <artifactId>meta-base</artifactId>
                 <version>1.0-SNAPSHOT</version>
-                <type>pom</type>
                 <scope>import</scope>
             </dependency>
         </dependencies>
