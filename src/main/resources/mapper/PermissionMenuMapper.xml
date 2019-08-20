@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.boot.permission.mapper.PermissionMenuMapper" >
+
+    <sql id="Base_Column_List" >
+        gid as "gid",
+        app_type as "appType",
+        menu_type as "menuType",
+        menu_name as "menuName",
+        menu_desc as "menuDesc",
+        parent_id as "parentId",
+        menu_link as "menuLink",
+        sort as "sort",
+        record_status as "recordStatus",
+        update_user as "updateUser",
+        create_user as "createUser",
+        update_time as "updateTime",
+        create_time as "createTime"
+    </sql>
+
+    <resultMap id="recursionItemMenuMap" type="com.spring.boot.feign.pojo.permission.vo.PermissionMenuVO">
+        <id column="gid" property="gid"/>
+        <result column="record_status" property="recordStatus"/>
+        <result column="state" property="state"/>
+        <result column="gid" property="gid"/>
+        <collection property="children" ofType="com.spring.boot.feign.pojo.permission.vo.PermissionMenuVO"
+                    column="{state=state,id=gid}" select="fetchItemMenuByParentId"/>
+    </resultMap>
+
+    <select id="fetchPermissionMenuList" resultMap="recursionItemMenuMap">
+        SELECT
+            *,#{recordStatus} AS state
+        FROM permission_menu
+        WHERE parent_id = '' OR parent_id IS NULL
+        AND app_type = #{appType}
+        <if test="recordStatus != null">
+            AND record_status = #{recordStatus}
+        </if>
+        ORDER BY `sort` ASC
+    </select>
+
+    <select id="fetchItemMenuByParentId" resultMap="recursionItemMenuMap">
+        SELECT
+            *,#{state} AS state
+        FROM permission_menu
+        WHERE parent_id = #{id}
+        <if test="state != null">
+            AND record_status = #{state}
+        </if>
+        ORDER BY `sort` ASC
+    </select>
+
+    <select id="fetchRecordList" resultType="com.spring.boot.feign.pojo.permission.PermissionMenu">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM permission_menu s0
+        <include refid="findPermissionMenuWhere"/>
+        ORDER BY update_time DESC
+    </select>
+
+    <sql id="findPermissionMenuWhere">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="permissionMenuSql" />
+        </trim>
+    </sql>
+
+    <sql id="permissionMenuSql">
+        <if test="gid != null and gid != ''">
+            AND s0.gid = #{gid,jdbcType=VARCHAR}
+        </if>
+        <if test="appType != null and appType != ''">
+            AND s0.app_type LIKE CONCAT('%',#{appType,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="menuType != null">
+            AND s0.menu_type = #{menuType,jdbcType=INTEGER}
+        </if>
+        <if test="menuName != null and menuName != ''">
+            AND s0.menu_name LIKE CONCAT('%',#{menuName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="menuDesc != null and menuDesc != ''">
+            AND s0.menu_desc LIKE CONCAT('%',#{menuDesc,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="parentId != null and parentId != ''">
+            AND s0.parent_id = #{parentId,jdbcType=VARCHAR}
+        </if>
+        <if test="menuLink != null and menuLink != ''">
+            AND s0.menu_link LIKE CONCAT('%',#{menuLink,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="sort != null">
+            AND s0.sort = #{sort,jdbcType=INTEGER}
+        </if>
+        <if test="recordStatus != null">
+            AND s0.record_status = #{recordStatus,jdbcType=INTEGER}
+        </if>
+    </sql>
+
+</mapper>

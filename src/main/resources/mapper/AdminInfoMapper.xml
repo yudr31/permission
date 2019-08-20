@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.boot.permission.mapper.AdminInfoMapper" >
+
+    <sql id="Base_Column_List" >
+        gid as "gid",
+        user_name as "userName",
+        salt_random as "saltRandom",
+        password as "password",
+        avatar as "avatar",
+        login_flag as "loginFlag",
+        login_count as "loginCount",
+        fail_count as "failCount",
+        lock_status as "lockStatus",
+        login_time as "loginTime",
+        record_status as "recordStatus",
+        update_user as "updateUser",
+        create_user as "createUser",
+        update_time as "updateTime",
+        create_time as "createTime"
+    </sql>
+
+    <select id="fetchAdminInfoByUserName" resultType="com.spring.boot.feign.pojo.permission.AdminInfo">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM admin_info
+        WHERE user_name = #{userName}
+        LIMIT 1
+    </select>
+
+    <select id="fetchRecordList" resultType="com.spring.boot.feign.pojo.permission.AdminInfo">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM admin_info s0
+        <include refid="findAdminInfoWhere"/>
+        ORDER BY update_time DESC
+    </select>
+
+    <sql id="findAdminInfoWhere">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="adminInfoSql" />
+        </trim>
+    </sql>
+
+    <sql id="adminInfoSql">
+        <if test="gid != null and gid != ''">
+            AND s0.gid = #{gid,jdbcType=VARCHAR}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND s0.user_name LIKE CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="saltRandom != null and saltRandom != ''">
+            AND s0.salt_random LIKE CONCAT('%',#{saltRandom,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="password != null and password != ''">
+            AND s0.password = #{password,jdbcType=VARCHAR}
+        </if>
+        <if test="avatar != null and avatar != ''">
+            AND s0.avatar LIKE CONCAT('%',#{avatar,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="loginFlag != null">
+            AND s0.login_flag = #{loginFlag,jdbcType=INTEGER}
+        </if>
+        <if test="loginCount != null">
+            AND s0.login_count = #{loginCount,jdbcType=INTEGER}
+        </if>
+        <if test="failCount != null">
+            AND s0.fail_count = #{failCount,jdbcType=INTEGER}
+        </if>
+        <if test="lockStatus != null">
+            AND s0.lock_status = #{lockStatus,jdbcType=INTEGER}
+        </if>
+        <if test="loginTime != null">
+            AND s0.login_time = #{loginTime,jdbcType=DATETIME}
+        </if>
+        <if test="recordStatus != null">
+            AND s0.record_status = #{recordStatus,jdbcType=INTEGER}
+        </if>
+    </sql>
+
+</mapper>

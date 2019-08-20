@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.boot.permission.mapper.PermissionResourceMapper" >
+
+    <sql id="Base_Column_List" >
+        gid as "gid",
+        app_type as "appType",
+        subject_type as "subjectType",
+        subject_id as "subjectId",
+        subject_name as "subjectName",
+        menu_id as "menuId",
+        menu_name as "menuName",
+        permission as "permission",
+        is_forbidden as "isForbidden",
+        is_disabled as "isDisabled",
+        record_status as "recordStatus",
+        update_user as "updateUser",
+        create_user as "createUser",
+        update_time as "updateTime",
+        create_time as "createTime"
+    </sql>
+
+    <delete id="deleteByRoleId">
+        DELETE FROM permission_resource
+        WHERE subject_id = #{subjectId}
+    </delete>
+
+    <select id="fetchResourceListBySubjectList" resultType="com.spring.boot.feign.pojo.permission.PermissionResource">
+        SELECT * FROM permission_resource
+        WHERE subject_id IN (
+        <foreach collection="subjectList" item="subjectId" separator=",">
+            #{subjectId}
+        </foreach>
+        )
+    </select>
+
+
+    <select id="fetchRecordList" resultType="com.spring.boot.feign.pojo.permission.PermissionResource">
+        SELECT
+            <include refid="Base_Column_List" />
+        FROM permission_resource s0
+        <include refid="findPermissionResourceWhere"/>
+        ORDER BY update_time DESC
+    </select>
+
+    <sql id="findPermissionResourceWhere">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="permissionResourceSql" />
+        </trim>
+    </sql>
+
+    <sql id="permissionResourceSql">
+        <if test="gid != null and gid != ''">
+            AND s0.gid = #{gid,jdbcType=BIGINT}
+        </if>
+        <if test="appType != null and appType != ''">
+            AND s0.app_type LIKE CONCAT('%',#{appType,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="subjectType != null and subjectType != ''">
+            AND s0.subject_type LIKE CONCAT('%',#{subjectType,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="subjectId != null and subjectId != ''">
+            AND s0.subject_id = #{subjectId,jdbcType=BIGINT}
+        </if>
+        <if test="subjectName != null and subjectName != ''">
+            AND s0.subject_name LIKE CONCAT('%',#{subjectName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="menuId != null and menuId != ''">
+            AND s0.menu_id = #{menuId,jdbcType=BIGINT}
+        </if>
+        <if test="menuName != null and menuName != ''">
+            AND s0.menu_name LIKE CONCAT('%',#{menuName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="permission != null">
+            AND s0.permission = #{permission,jdbcType=INTEGER}
+        </if>
+        <if test="isForbidden != null">
+            AND s0.is_forbidden = #{isForbidden,jdbcType=INTEGER}
+        </if>
+        <if test="isDisabled != null">
+            AND s0.is_disabled = #{isDisabled,jdbcType=INTEGER}
+        </if>
+        <if test="recordStatus != null">
+            AND s0.record_status = #{recordStatus,jdbcType=INTEGER}
+        </if>
+    </sql>
+
+</mapper>

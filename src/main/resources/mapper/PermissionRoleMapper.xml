@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.boot.permission.mapper.PermissionRoleMapper" >
+
+    <sql id="Base_Column_List" >
+        gid as "gid",
+        app_type as "appType",
+        role_type as "roleType",
+        role_name as "roleName",
+        role_desc as "roleDesc",
+        priority as "priority",
+        record_status as "recordStatus",
+        update_user as "updateUser",
+        create_user as "createUser",
+        update_time as "updateTime",
+        create_time as "createTime"
+    </sql>
+
+    <select id="fetchPermissionRoleByUserId" resultType="com.spring.boot.feign.pojo.permission.PermissionRole">
+        SELECT pr.* FROM permission_role pr
+        LEFT JOIN permission_user pu ON
+        pu.role_id = pr.gid
+        WHERE pu.user_id = #{userId}
+    </select>
+
+    <select id="fetchRecordList" resultType="com.spring.boot.feign.pojo.permission.PermissionRole">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM permission_role s0
+        <include refid="findPermissionRoleWhere"/>
+        ORDER BY update_time DESC
+    </select>
+
+    <sql id="findPermissionRoleWhere">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="permissionRoleSql" />
+        </trim>
+    </sql>
+
+    <sql id="permissionRoleSql">
+        <if test="gid != null and gid != ''">
+            AND s0.gid = #{gid,jdbcType=VARCHAR}
+        </if>
+        <if test="appType != null and appType != ''">
+            AND s0.app_type LIKE CONCAT('%',#{appType,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="roleType != null">
+            AND s0.role_type = #{roleType,jdbcType=INTEGER}
+        </if>
+        <if test="roleName != null and roleName != ''">
+            AND s0.role_name LIKE CONCAT('%',#{roleName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="roleDesc != null and roleDesc != ''">
+            AND s0.role_desc LIKE CONCAT('%',#{roleDesc,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="priority != null">
+            AND s0.priority = #{priority,jdbcType=INTEGER}
+        </if>
+        <if test="recordStatus != null">
+            AND s0.record_status = #{recordStatus,jdbcType=INTEGER}
+        </if>
+    </sql>
+
+</mapper>

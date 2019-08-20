@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.boot.permission.mapper.PermissionUserMapper" >
+
+    <sql id="Base_Column_List" >
+        gid as "gid",
+        app_type as "appType",
+        user_id as "userId",
+        user_name as "userName",
+        role_id as "roleId",
+        role_name as "roleName",
+        is_disabled as "isDisabled",
+        record_status as "recordStatus",
+        update_user as "updateUser",
+        create_user as "createUser",
+        update_time as "updateTime",
+        create_time as "createTime"
+    </sql>
+
+    <select id="fetchRecordList" resultType="com.spring.boot.feign.pojo.permission.PermissionUser">
+        SELECT
+            <include refid="Base_Column_List" />
+        FROM permission_user s0
+        <include refid="findPermissionUserWhere"/>
+        ORDER BY update_time DESC
+    </select>
+
+    <sql id="findPermissionUserWhere">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="permissionUserSql" />
+        </trim>
+    </sql>
+
+    <sql id="permissionUserSql">
+        <if test="gid != null and gid != ''">
+            AND s0.gid = #{gid,jdbcType=BIGINT}
+        </if>
+	  <if test="appType != null and appType != ''">
+            AND s0.app_type LIKE CONCAT('%',#{appType,jdbcType=VARCHAR},'%')
+        </if>
+	  <if test="userId != null and userId != ''">
+            AND s0.user_id = #{userId,jdbcType=BIGINT}
+        </if>
+	  <if test="userName != null and userName != ''">
+            AND s0.user_name LIKE CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+        </if>
+	  <if test="roleId != null and roleId != ''">
+            AND s0.role_id = #{roleId,jdbcType=BIGINT}
+        </if>
+	  <if test="roleName != null and roleName != ''">
+            AND s0.role_name LIKE CONCAT('%',#{roleName,jdbcType=VARCHAR},'%')
+        </if>
+	  <if test="isDisabled != null">
+            AND s0.is_disabled = #{isDisabled,jdbcType=INTEGER}
+        </if>
+	  <if test="recordStatus != null">
+            AND s0.record_status = #{recordStatus,jdbcType=INTEGER}
+        </if>
+    </sql>
+
+</mapper>
