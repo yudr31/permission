@@ -1,10 +1,10 @@
 eureka:
-  instance:
-    hostname: permission # eureka服务端的实例名称
   client:
     service-url:
       defaultZone: http://localhost:9001/eureka/  # 设置与Eureka Server交互的地址查询服务和注册服务
-
+  instance:
+    instance-id: permission-id
+    prefer-ip-address: true
 
 spring:
   datasource:
